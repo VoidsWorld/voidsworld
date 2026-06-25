@@ -13,9 +13,8 @@
 
     .portal-bg {
       position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse at 20% 50%, #1a003a 0%, #0d0d0d 50%, #000510 100%);
-    }
-    .portal-bg::before {
+      background: radial-gradient(ellipse at 20% 50%, #1a003a 0%, #0d0d0d 50%, #000510 
+    .portal-bg::before {o
       content: '';
       position: absolute; inset: 0;
       background: radial-gradient(ellipse at 80% 20%, rgba(120,0,255,0.18) 0%, transparent 60%),
@@ -191,29 +190,6 @@
     /* Verification Form Styles */
     .verification-text { font-size: 0.85rem; color: rgba(180,130,255,0.8); line-height: 1.5; margin-bottom: 16px; font-family: 'Inter', sans-serif; }
     .verification-email { color: #a855f7; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
-  </style>
+  </
 </head>
 <body>
-
-  <!-- BACKGROUND GRAPHICS -->
-  <div class="portal-bg"></div>
-  <div class="grid-lines"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <!-- PORTAL ACCESS CARD -->
-  <main class="portal-card">
-    
-    <div class="portal-logo">
-      <div class="sigil">Ω</div>
-      <h1>VOIDSWORLD</h1>
-      <p>SECURE GATEWAY v3.4.0</p>
-    </div>
-
-    <!-- SYSTEM TABS -->
-    <div class="auth-tabs" id="authTabs">
-      <button class="auth-tab active" id="tabSignIn">Sign In</button>
-      <button class="auth-tab" id="tabSignUp">Sign Up</button>
-    </div>
-
