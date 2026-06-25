@@ -320,5 +320,107 @@
   </div>
 
   <script src="js/auth.js"></script>
+  document.addEventListener('DOMContentLoaded', () => {
+      // --- TAB SWITCHING LOGIC ---
+      const tabs = document.querySelectorAll('.auth-tab');
+      const panels = document.querySelectorAll('.auth-panel');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active state from all tabs and panels
+          tabs.forEach(t => t.classList.remove('active'));
+          panels.forEach(p => p.classList.remove('active'));
+
+          // Add active state to clicked tab and corresponding panel
+          tab.classList.add('active');
+          const target = tab.getAttribute('data-tab');
+          document.getElementById(`panel-${target}`).classList.add('active');
+        });
+      });
+
+      // --- KEY GENERATION LOGIC ---
+      const btnGenerate = document.getElementById('btn-generate');
+      const keyText = document.getElementById('key-text');
+      const keyContainer = document.getElementById('generated-key-container');
+      const genStatus = document.getElementById('gen-status');
+      const copyIcon = document.getElementById('copy-btn');
+
+      // Helper function to generate a random 4-character alphanumeric segment
+      function generateSegment() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      }
+
+      btnGenerate.addEventListener('click', () => {
+        // Create the key format: VW-XXXX-XXXX-XXXX
+        const newKey = `VW-${generateSegment()}-${generateSegment()}-${generateSegment()}`;
+        keyText.textContent = newKey;
+        
+        // MOCK BACKEND: Save to localStorage so the login tab can verify it
+        localStorage.setItem('voidsWorld_validKey', newKey);
+
+        showStatus(genStatus, 'Key generated. Save this securely.', 'success');
+      });
+
+      // --- COPY TO CLIPBOARD LOGIC ---
+      keyContainer.addEventListener('click', () => {
+        const key = keyText.textContent;
+        // Only copy if a key has actually been generated
+        if (key && key.startsWith('VW-')) {
+          navigator.clipboard.writeText(key).then(() => {
+            copyIcon.textContent = 'COPIED';
+            copyIcon.style.color = '#7fffaa';
+            
+            setTimeout(() => { 
+              copyIcon.textContent = 'COPY'; 
+              copyIcon.style.color = '#e8d5ff';
+            }, 2000);
+          });
+        }
+      });
+
+      // --- LOGIN VERIFICATION LOGIC ---
+      const btnLogin = document.getElementById('btn-login');
+      const inputKey = document.getElementById('portal-key');
+      const loginStatus = document.getElementById('login-status');
+
+      btnLogin.addEventListener('click', () => {
+        const enteredKey = inputKey.value.trim().toUpperCase();
+        
+        // Fetch our mock backend key
+        const validKey = localStorage.getItem('voidsWorld_validKey'); 
+
+        if (!enteredKey) {
+          showStatus(loginStatus, 'ERROR: Key field is empty.', 'error');
+          return;
+        }
+
+        // Mock verification
+        if (enteredKey === validKey) {
+          showStatus(loginStatus, 'ACCESS GRANTED. Initializing Node...', 'success');
+          
+          // Here is where you would redirect the user to the actual site:
+          // setTimeout(() => { window.location.href = '/dashboard.html'; }, 1500);
+          
+        } else {
+          showStatus(loginStatus, 'ACCESS DENIED. Invalid Key.', 'error');
+        }
+      });
+
+      // --- HELPER FUNCTION FOR STATUS MESSAGES ---
+      function showStatus(element, message, type) {
+        element.textContent = message;
+        element.className = `status-msg ${type}`;
+        element.style.display = 'block';
+        
+        // Hide message after 3 seconds
+        setTimeout(() => { 
+          element.style.display = 'none'; 
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
 </body>
 </html>
