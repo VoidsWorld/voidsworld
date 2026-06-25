@@ -4,203 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VoidsWorld — Access Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <style>
-    /* ── INDEX-SPECIFIC LAYOUT ── */
-    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
-
-    .portal-bg {
-      position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse at 20% 50%, #1a003a 0%, #0d0d0d 50%, #000510 100%);
-    }
-    .portal-bg::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 80% 20%, rgba(120,0,255,0.18) 0%, transparent 60%),
-                  radial-gradient(ellipse at 10% 80%, rgba(80,0,200,0.12) 0%, transparent 50%);
-    }
-    .grid-lines {
-      position: fixed; inset: 0; z-index: 0; opacity: 0.06;
-      background-image:
-        linear-gradient(rgba(150,0,255,0.8) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(150,0,255,0.8) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridPulse 8s ease-in-out infinite alternate;
-    }
-    @keyframes gridPulse { from { opacity: 0.04; } to { opacity: 0.09; } }
-
-    /* Floating orbs */
-    .orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: 0; animation: orbFloat 12s ease-in-out infinite alternate; }
-    .orb-1 { width: 400px; height: 400px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(120,0,255,0.25), transparent 70%); animation-duration: 10s; }
-    .orb-2 { width: 300px; height: 300px; bottom: -80px; right: -80px; background: radial-gradient(circle, rgba(80,0,180,0.2), transparent 70%); animation-duration: 14s; animation-delay: -4s; }
-    .orb-3 { width: 200px; height: 200px; top: 50%; left: 60%; background: radial-gradient(circle, rgba(160,0,255,0.15), transparent 70%); animation-duration: 8s; animation-delay: -2s; }
-    @keyframes orbFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.1); } }
-
-    /* Portal card */
-    .portal-card {
-      position: relative; z-index: 10;
-      width: min(460px, 92vw);
-      background: rgba(10,0,20,0.85);
-      border: 1px solid rgba(150,0,255,0.3);
-      border-radius: 20px;
-      padding: 48px 40px 40px;
-      backdrop-filter: blur(24px);
-      box-shadow: 0 0 60px rgba(120,0,255,0.15), 0 0 120px rgba(80,0,200,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
-      animation: cardIn 0.7s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    @keyframes cardIn { from { opacity:0; transform: translateY(30px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
-
-    .portal-logo {
-      text-align: center; margin-bottom: 36px;
-    }
-    .portal-logo .sigil {
-      width: 64px; height: 64px; margin: 0 auto 16px;
-      border: 2px solid rgba(150,0,255,0.5);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(100,0,255,0.1);
-      box-shadow: 0 0 30px rgba(120,0,255,0.3);
-      font-size: 28px;
-    }
-    .portal-logo h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.6rem; font-weight: 900;
-      background: linear-gradient(135deg, #bf7fff 0%, #7b00ff 50%, #4400aa 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      letter-spacing: 0.1em;
-    }
-    .portal-logo p {
-      font-size: 0.75rem; color: rgba(180,130,255,0.6);
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.2em; margin-top: 4px;
-    }
-
-    /* Tabs */
-    .auth-tabs {
-      display: flex; gap: 4px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(150,0,255,0.15);
-      border-radius: 10px; padding: 4px; margin-bottom: 28px;
-    }
-    .auth-tab {
-      flex: 1; padding: 10px; border: none; background: transparent;
-      color: rgba(180,130,255,0.5); font-family: 'Inter', sans-serif;
-      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; cursor: pointer; border-radius: 7px;
-      transition: all 0.25s ease;
-    }
-    .auth-tab.active {
-      background: linear-gradient(135deg, rgba(120,0,255,0.4), rgba(80,0,200,0.3));
-      color: #d4aaff;
-      box-shadow: 0 0 20px rgba(120,0,255,0.2);
-    }
-
-    /* Forms */
-    .auth-panel { display: none; animation: fadeSlide 0.3s ease; }
-    .auth-panel.active { display: block; }
-    @keyframes fadeSlide { from { opacity:0; transform: translateX(8px); } to { opacity:1; transform: translateX(0); } }
-
-    .field-group { margin-bottom: 18px; }
-    .field-group label {
-      display: block; margin-bottom: 7px;
-      font-size: 0.72rem; font-weight: 600;
-      color: rgba(180,130,255,0.7); letter-spacing: 0.12em;
-      text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
-    }
-    .field-group input {
-      width: 100%; padding: 13px 16px;
-      background: rgba(20,0,40,0.6);
-      border: 1px solid rgba(150,0,255,0.25);
-      border-radius: 10px;
-      color: #e8d5ff; font-family: 'Inter', sans-serif; font-size: 0.92rem;
-      outline: none; transition: all 0.2s ease; box-sizing: border-box;
-    }
-    .field-group input:focus {
-      border-color: rgba(150,0,255,0.7);
-      background: rgba(30,0,60,0.7);
-      box-shadow: 0 0 0 3px rgba(120,0,255,0.12), 0 0 20px rgba(120,0,255,0.1);
-    }
-    .field-group input::placeholder { color: rgba(150,100,220,0.4); }
-
-    .key-display {
-      background: rgba(10,0,25,0.8);
-      border: 1px solid rgba(120,0,255,0.35);
-      border-radius: 10px; padding: 14px 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem; color: #a855f7;
-      letter-spacing: 0.05em; word-break: break-all;
-      min-height: 48px; display: flex; align-items: center;
-      gap: 10px; cursor: pointer; transition: border-color 0.2s;
-    }
-    .key-display:hover { border-color: rgba(150,0,255,0.6); }
-    .key-display .copy-icon { margin-left: auto; opacity: 0.6; font-size: 1rem; flex-shrink: 0; }
-
-    .btn-primary {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #7b00ff 0%, #4400bb 60%, #2d007a 100%);
-      border: 1px solid rgba(150,0,255,0.5);
-      border-radius: 10px; color: #f0e0ff;
-      font-family: 'Orbitron', monospace; font-size: 0.82rem;
-      font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
-      cursor: pointer; margin-top: 8px;
-      box-shadow: 0 4px 24px rgba(120,0,255,0.3);
-      transition: all 0.2s ease; position: relative; overflow: hidden;
-    }
-    .btn-primary::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(120,0,255,0.45); }
-    .btn-primary:hover::before { opacity: 1; }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .status-msg {
-      margin-top: 14px; padding: 11px 14px; border-radius: 8px;
-      font-size: 0.8rem; font-family: 'JetBrains Mono', monospace;
-      display: none; animation: fadeIn 0.25s ease;
-    }
-    .status-msg.success { background: rgba(0,255,100,0.07); border: 1px solid rgba(0,255,100,0.25); color: #7fffaa; }
-    .status-msg.error   { background: rgba(255,50,50,0.07);  border: 1px solid rgba(255,50,50,0.25);  color: #ff9090; }
-    .status-msg.info    { background: rgba(120,0,255,0.08);  border: 1px solid rgba(120,0,255,0.3);   color: #c4a0ff; }
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-    .divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
-    .divider span { flex: 1; height: 1px; background: rgba(150,0,255,0.2); }
-    .divider em { font-size: 0.7rem; color: rgba(150,100,220,0.5); font-style: normal; font-family: 'JetBrains Mono', monospace; }
-
-    .oauth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btn-oauth {
-      padding: 11px 10px; background: rgba(20,0,40,0.6);
-      border: 1px solid rgba(150,0,255,0.2); border-radius: 9px;
-      color: rgba(200,160,255,0.8); font-size: 0.78rem;
-      font-family: 'Inter', sans-serif; font-weight: 500;
-      cursor: pointer; transition: all 0.2s ease;
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-    }
-    .btn-oauth:hover { border-color: rgba(150,0,255,0.5); background: rgba(40,0,80,0.5); color: #d4aaff; }
-
-    .terms { text-align: center; margin-top: 20px; font-size: 0.7rem; color: rgba(130,80,200,0.5); }
-
-    /* Loading spinner */
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Step indicator */
-    .step-indicator {
-      display: flex; gap: 6px; justify-content: center; margin-bottom: 24px;
-    }
-    .step-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(150,0,255,0.25); transition: all 0.3s ease;
-    }
-    .step-dot.active { background: #7b00ff; box-shadow: 0 0 10px rgba(120,0,255,0.6); width: 20px; border-radius: 3px; }
-  </style>
-</head>
+  </head>
 <body>
+
   <div class="portal-bg"></div>
   <div class="grid-lines"></div>
   <div class="orb orb-1"></div>
@@ -209,218 +15,91 @@
 
   <div class="portal-card">
     <div class="portal-logo">
-      <div class="sigil">⬡</div>
+      <div class="sigil">Ω</div>
       <h1>VOIDSWORLD</h1>
-      <p>SECURE ACCESS PORTAL v2.0</p>
+      <p>Secure Node Access</p>
     </div>
 
     <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login')">Enter Key</button>
-      <button class="auth-tab" onclick="switchTab('request')">Get Key</button>
+      <button class="auth-tab active" data-tab="login">Enter Node</button>
+      <button class="auth-tab" data-tab="register">Generate Key</button>
     </div>
 
-    <!-- LOGIN PANEL: Enter existing key -->
     <div class="auth-panel active" id="panel-login">
-      <div class="step-indicator">
-        <div class="step-dot active" id="login-dot-1"></div>
-        <div class="step-dot" id="login-dot-2"></div>
+      <div class="field-group">
+        <label for="portal-key">Authorization Key</label>
+        <input type="text" id="portal-key" placeholder="VW-XXXX-XXXX-XXXX" autocomplete="off" />
       </div>
-
-      <div id="login-step-1">
-        <div class="field-group">
-          <label>Email Address</label>
-          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
-        </div>
-        <button class="btn-primary" onclick="loginStep1()">
-          CONTINUE →
-        </button>
-      </div>
-
-      <div id="login-step-2" style="display:none;">
-        <div class="field-group">
-          <label>Your Access Key</label>
-          <input type="text" id="login-key" placeholder="VW-XXXX-XXXX-XXXX-XXXX" autocomplete="off" maxlength="24" oninput="formatKeyInput(this)" />
-        </div>
-        <div class="field-group">
-          <label>Password</label>
-          <input type="password" id="login-pass" placeholder="••••••••••••" autocomplete="current-password" />
-        </div>
-        <button class="btn-primary" onclick="loginStep2()">
-          ENTER THE VOID
-        </button>
-        <button onclick="loginBack()" style="width:100%;padding:10px;background:transparent;border:none;color:rgba(150,100,220,0.6);font-size:0.78rem;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif;">← Back</button>
-      </div>
-
+      <button class="btn-primary" id="btn-login">Verify Access</button>
       <div class="status-msg" id="login-status"></div>
-
-      <div class="divider"><span></span><em>OR SIGN IN WITH</em><span></span></div>
-      <div class="oauth-grid">
-        <button class="btn-oauth" onclick="oauthLogin('google')">
-          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Google
-        </button>
-        <button class="btn-oauth" onclick="oauthLogin('github')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </button>
-        <button class="btn-oauth" onclick="oauthLogin('discord')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.113a19.904 19.904 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          Discord
-        </button>
-        <button class="btn-oauth" onclick="oauthLogin('microsoft')">
-          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#00a4ef" d="M13 1h10v10H13z"/><path fill="#7fba00" d="M1 13h10v10H1z"/><path fill="#ffb900" d="M13 13h10v10H13z"/></svg>
-          Microsoft
-        </button>
-      </div>
     </div>
 
-    <!-- REQUEST PANEL: Get a new key -->
-    <div class="auth-panel" id="panel-request">
-      <div id="req-step-1">
-        <div class="field-group">
-          <label>Email Address</label>
-          <input type="email" id="req-email" placeholder="you@example.com" autocomplete="email" />
+    <div class="auth-panel" id="panel-register">
+      <div class="field-group">
+        <label>Your Generated Key</label>
+        <div class="key-display" id="generated-key-container">
+          <span id="key-text">Click below to generate...</span>
+          <span class="copy-icon" id="copy-btn">COPY</span>
         </div>
-        <div class="field-group">
-          <label>Create Password</label>
-          <input type="password" id="req-pass" placeholder="Min 8 characters" autocomplete="new-password" />
-        </div>
-        <div class="field-group">
-          <label>Confirm Password</label>
-          <input type="password" id="req-pass2" placeholder="Repeat password" autocomplete="new-password" />
-        </div>
-        <button class="btn-primary" onclick="requestKey()">
-          GENERATE MY KEY
-        </button>
       </div>
-
-      <div id="req-step-2" style="display:none;">
-        <div style="text-align:center;margin-bottom:20px;">
-          <div style="font-size:2.5rem;margin-bottom:12px;">🔑</div>
-          <p style="color:#a855f7;font-family:'Orbitron',monospace;font-size:0.85rem;letter-spacing:0.1em;">KEY GENERATED</p>
-          <p style="color:rgba(180,130,255,0.6);font-size:0.78rem;margin-top:8px;">This key is permanently tied to your email. Save it securely.</p>
-        </div>
-        <div class="field-group">
-          <label>Your Unique Access Key (click to copy)</label>
-          <div class="key-display" id="generated-key-display" onclick="copyKey()">
-            <span id="generated-key-text">Generating...</span>
-            <span class="copy-icon">⧉</span>
-          </div>
-        </div>
-        <div id="copy-toast" style="display:none;text-align:center;font-size:0.75rem;color:#7fffaa;font-family:'JetBrains Mono',monospace;margin-top:8px;">✓ Copied to clipboard</div>
-        <button class="btn-primary" onclick="goToLogin()">
-          PROCEED TO LOGIN →
-        </button>
-      </div>
-
-      <div class="status-msg" id="req-status"></div>
+      <button class="btn-primary" id="btn-generate">Generate Access Token</button>
+      <div class="status-msg" id="gen-status"></div>
     </div>
-
-    <div class="terms">By accessing VoidsWorld you agree to our <a href="#" style="color:rgba(160,100,255,0.7);">Terms</a> & <a href="#" style="color:rgba(160,100,255,0.7);">Privacy Policy</a></div>
   </div>
 
-  <script src="js/auth.js"></script>
-  document.addEventListener('DOMContentLoaded', () => {
-      // --- TAB SWITCHING LOGIC ---
-      const tabs = document.querySelectorAll('.auth-tab');
-      const panels = document.querySelectorAll('.auth-panel');
-
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          // Remove active state from all tabs and panels
-          tabs.forEach(t => t.classList.remove('active'));
-          panels.forEach(p => p.classList.remove('active'));
-
-          // Add active state to clicked tab and corresponding panel
-          tab.classList.add('active');
-          const target = tab.getAttribute('data-tab');
-          document.getElementById(`panel-${target}`).classList.add('active');
-        });
+  <script>
+    // 1. Tab Switching
+    const tabs = document.querySelectorAll('.auth-tab');
+    const panels = document.querySelectorAll('.auth-panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
       });
+    });
 
-      // --- KEY GENERATION LOGIC ---
-      const btnGenerate = document.getElementById('btn-generate');
-      const keyText = document.getElementById('key-text');
-      const keyContainer = document.getElementById('generated-key-container');
-      const genStatus = document.getElementById('gen-status');
-      const copyIcon = document.getElementById('copy-btn');
+    // 2. Key Generation
+    const btnGenerate = document.getElementById('btn-generate');
+    const keyText = document.getElementById('key-text');
+    const genStatus = document.getElementById('gen-status');
 
-      // Helper function to generate a random 4-character alphanumeric segment
-      function generateSegment() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    btnGenerate.addEventListener('click', () => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const genSegment = () => Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      const newKey = `VW-${genSegment()}-${genSegment()}-${genSegment()}`;
+      
+      keyText.textContent = newKey;
+      localStorage.setItem('voidsWorld_key', newKey);
+      
+      genStatus.textContent = "Key generated! Save this.";
+      genStatus.className = "status-msg success";
+      genStatus.style.display = "block";
+    });
+
+    // 3. Login Verification
+    const btnLogin = document.getElementById('btn-login');
+    const inputKey = document.getElementById('portal-key');
+    const loginStatus = document.getElementById('login-status');
+
+    btnLogin.addEventListener('click', () => {
+      const storedKey = localStorage.getItem('voidsWorld_key');
+      if (inputKey.value.trim().toUpperCase() === storedKey && storedKey !== null) {
+        loginStatus.textContent = "Access Granted. Redirecting...";
+        loginStatus.className = "status-msg success";
+      } else {
+        loginStatus.textContent = "Access Denied. Invalid Token.";
+        loginStatus.className = "status-msg error";
       }
+      loginStatus.style.display = "block";
+    });
 
-      btnGenerate.addEventListener('click', () => {
-        // Create the key format: VW-XXXX-XXXX-XXXX
-        const newKey = `VW-${generateSegment()}-${generateSegment()}-${generateSegment()}`;
-        keyText.textContent = newKey;
-        
-        // MOCK BACKEND: Save to localStorage so the login tab can verify it
-        localStorage.setItem('voidsWorld_validKey', newKey);
-
-        showStatus(genStatus, 'Key generated. Save this securely.', 'success');
-      });
-
-      // --- COPY TO CLIPBOARD LOGIC ---
-      keyContainer.addEventListener('click', () => {
-        const key = keyText.textContent;
-        // Only copy if a key has actually been generated
-        if (key && key.startsWith('VW-')) {
-          navigator.clipboard.writeText(key).then(() => {
-            copyIcon.textContent = 'COPIED';
-            copyIcon.style.color = '#7fffaa';
-            
-            setTimeout(() => { 
-              copyIcon.textContent = 'COPY'; 
-              copyIcon.style.color = '#e8d5ff';
-            }, 2000);
-          });
-        }
-      });
-
-      // --- LOGIN VERIFICATION LOGIC ---
-      const btnLogin = document.getElementById('btn-login');
-      const inputKey = document.getElementById('portal-key');
-      const loginStatus = document.getElementById('login-status');
-
-      btnLogin.addEventListener('click', () => {
-        const enteredKey = inputKey.value.trim().toUpperCase();
-        
-        // Fetch our mock backend key
-        const validKey = localStorage.getItem('voidsWorld_validKey'); 
-
-        if (!enteredKey) {
-          showStatus(loginStatus, 'ERROR: Key field is empty.', 'error');
-          return;
-        }
-
-        // Mock verification
-        if (enteredKey === validKey) {
-          showStatus(loginStatus, 'ACCESS GRANTED. Initializing Node...', 'success');
-          
-          // Here is where you would redirect the user to the actual site:
-          // setTimeout(() => { window.location.href = '/dashboard.html'; }, 1500);
-          
-        } else {
-          showStatus(loginStatus, 'ACCESS DENIED. Invalid Key.', 'error');
-        }
-      });
-
-      // --- HELPER FUNCTION FOR STATUS MESSAGES ---
-      function showStatus(element, message, type) {
-        element.textContent = message;
-        element.className = `status-msg ${type}`;
-        element.style.display = 'block';
-        
-        // Hide message after 3 seconds
-        setTimeout(() => { 
-          element.style.display = 'none'; 
-        }, 3000);
-      }
+    // 4. Copy to Clipboard
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(keyText.textContent);
+      alert("Key copied to clipboard!");
     });
   </script>
-</body>
-</html>
 </body>
 </html>
